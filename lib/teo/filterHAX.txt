@@ -1,0 +1,41 @@
+---SUMMARY---
+
+I call updateChart "stored" in File1 from File2, by making updateChart a global variable
+
+----Map.js----
+
+function makeMap(){
+    ##map is made##
+    .on("click", changeFilter) //call changeFilter on when province is clicked
+}
+
+function changeFilter(){
+
+    //call updateChart from the OTHER File.
+    //this.clickedProvince is the hypothetical string with the province that you clicked on
+    updateChart(this.clickedProvince)
+}
+
+
+---Chart.js---
+
+//Make GLOBAL variable to store the updateChart function
+//cant set here because it still requires the data from within d3.csv
+var updateChart=null;
+
+d3.csv(...).then({
+    ##Make all the chart and stuff##
+
+    //update function
+    //set the GLOBAL updateChart variable to the function defined below
+    updateChart = function(filter){
+        //update the chart and stuff in here
+    }
+
+})
+
+---HOW TO POTENTIALLY IMPLEMENT---
+
+If your code has an update function, make it a global variable and it can be called from
+the map filter directly.
+
