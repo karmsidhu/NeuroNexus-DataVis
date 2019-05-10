@@ -8,15 +8,29 @@
   </head>
 
   <body>
-    <div>
-        <button id="resetProvinceButton">Reset</button>
-        <select id="provinceSelection">
-            <option value="">Please select a province</option>
-        </select>
+    <div class="content">
+      <div>
+          <button id="resetProvinceButton">Reset</button>
+          <button id="consoleLogData">Log Data</button>
+          <form id="dataTypeForm">
+            <p>Filter By:</p>
+            <input type="radio" name="groupBy" value="program" checked="checked">
+            Program<br>
+            <input type="radio" name="groupBy" value="gvtMinistry">
+            Government Ministry<br>
+            <input type="radio" name="groupBy" value="pType">
+            Program Type<br>  
+          </form>
+          <br>
+          <select id="provinceSelection">
+              <option value="">Please select a province</option>
+          </select>
+      </div>
+      
+      <div id="pieGraph"></div>
+      <div id="barGraph"></div>
+      <div id="scatterGraph"></div>
+      <script src="lib/main.js"></script>
     </div>
-    
-    <div id="pieGraph"></div>
-    <div id="barGraph"></div>
-    <script src="lib/main.js"></script>
   </body>
 </html>
