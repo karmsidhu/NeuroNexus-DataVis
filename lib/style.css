@@ -2,3 +2,13 @@
     max-width: 750px;
     margin-left: 100px;
 }
+
+.tooltip {
+    position: absolute;
+    border: solid;
+    border-width: 2px;
+    opacity: 0;
+    background-color: white;
+    font: 16px sans-serif;
+    padding: 5px;
+}
