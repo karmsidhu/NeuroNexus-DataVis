@@ -98,6 +98,7 @@ var graphs = {
 	line: {
 		height: 300,
 		width: 600,
+		extraWidth: 500,
 		margin: {
 			top: 30,
 			bottom: 30,
@@ -521,6 +522,7 @@ d3.csv(DATAURL, d => {
 				const
 					height = graphs.line.height,
 					width = graphs.line.width,
+					extraWidth = graphs.line.extraWidth,
 					margin = graphs.line.margin,
 					svg = graphs.line.svg('#lineGraph'),
 					color = d3.scaleOrdinal(d3.schemeDark2),
@@ -532,7 +534,7 @@ d3.csv(DATAURL, d => {
 					.y(d => {return y(d.value);});
 				
 				svg
-					.attr('width', width + margin.left + margin.right)
+					.attr('width', width + margin.left + margin.right + extraWidth)
 					.attr('height', height + margin.top + margin.bottom)
 				.append('g')
 					.attr("transform",`translate(${margin.left+margin.right},
@@ -563,6 +565,11 @@ d3.csv(DATAURL, d => {
 							${height})`)
 						.call(d3.axisBottom(x));
 
+				var legendBox = svg.append("g")
+					.attr("class","legend")
+					.attr("transform","translate(550,30)")
+					.style("font-size","12px");
+
 				const selectProvGroup = svg.selectAll('.provinceGroups')
 					.data(data, d => {return d;})
 					.enter()
@@ -575,12 +582,46 @@ d3.csv(DATAURL, d => {
 					.data(d => {return d.value.LineType;})
 					.enter()
 					.append('path');
-
+				
 				path
 					.attr('d', d => {return valueLine(d.values);})
 					.attr('class', 'line')
 					.style('stroke', (d, i) => color(i))
 					.style('fill', 'none');
+
+				legendBox.selectAll(".lineName")
+					.data(data, function(d){return d;})
+					.enter()
+					.append("g")
+					.attr("class", "lineName")
+					.attr("transform", `translate(${margin.left+margin.right},${margin.top+margin.bottom})`);
+		
+				legendContents = legendBox.select(".lineName");
+		
+				legendContents.selectAll("text")
+					.data(function(d){return d.value.LineType;})
+					.enter()
+					.append("text")
+					.text(function(d){ return d.key;})
+					.attr("transform", function(d,i){
+					return `translate( ${5} , ${i*15})`;//shuffle new text downwards by iterator
+					})
+					.append("text")
+					.text(function(d,i){ return i;});
+		
+		
+				legendContents.selectAll("rect")
+					.data(function(d){return d.value.LineType;})
+					.enter()
+					.append("rect")
+					.attr("x", 0)
+					.attr("y", -10)
+					.attr("width", 10)
+					.attr("height", 10)
+					.style("fill", (d, i) => color(i))
+					.attr("transform", function(d,i){
+					return "translate( -12 ," + i*15 + ")";//shuffle new text downwards by iterator
+					});
 
 				var mouseG = svg.append("g")
 					.attr("class", "mouse-over-effects")
@@ -589,7 +630,9 @@ d3.csv(DATAURL, d => {
 		
 				mouseG
 					.data(data)
-					.enter()
+					.enter();
+
+				mouseG
 					.append("path") // this is the black vertical line to follow mouse
 						.attr("class", "mouse-line")
 						.style("stroke", "black")
