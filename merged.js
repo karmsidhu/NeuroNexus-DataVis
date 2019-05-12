@@ -4,6 +4,50 @@ const DATAURL = 'https://gist.githubusercontent.com/TeoU2015/' +
 
 var transitionTime = 1000;
 
+var updateAll = null;
+var mapWidth = 900;
+var mapHeight = 250;
+var active = d3.select(null);//keep track of active province
+
+var mapSVG = d3.select("#map")
+  .append("svg")
+  .attr("width", mapWidth)
+  .attr("height", mapHeight)
+
+var canadaMap = mapSVG.append("g").attr("id", "mapGroup");
+var projection = d3.geoMercator()
+                    .scale(450)
+                    .translate([mapWidth*1.2, mapHeight*2.4]);
+
+var path = d3.geoPath().projection(projection);
+var mapSelection = null;
+
+//Changes filter and the color of active province
+function changeMapSelection(d){
+
+  //check if selected provinces is already active
+  //reset if true
+  //otherwise remove active from current, and make selection active
+  if(active.node() === this) return reset();
+  active.classed("active", false);
+  active = d3.select(this).classed("active", true);
+
+  //change the title (Potentially remove)
+  //filterText.text(this.__data__.properties.name);
+
+  //call updateAll
+  //this.__data__.properties.name == Province name (string)
+  mapSelection = this.__data__.properties.name;
+  //handler.filterByProvinceMap;
+  updateAll();
+}
+
+//reset selection
+function reset(){
+  active.classed("active", false);
+  active = d3.select(null);
+};
+
 var graphs = {
 	pie: {
 		height: 500,
@@ -82,7 +126,7 @@ var graphs = {
 
 var domElements = {
 	resetButton: document.getElementById('resetProvinceButton'),
-	provSelection: document.getElementById('provinceSelection'),
+	// provSelection: document.getElementById('provinceSelection'),
 	radioButton: document.getElementById('dataTypeForm'),
 	expendCaseloadsRadioButton: document.getElementById('expendVsCaseloads')
 };
@@ -119,6 +163,7 @@ d3.csv(DATAURL, d => {
 			data: loadedData,
 			pieData: null,
 			lineData: null,
+
 			filterData: (attr, val) => {
 				model.data = model.data.filter(d => {
 					return d[attr].trim() === val.trim();
@@ -195,21 +240,23 @@ d3.csv(DATAURL, d => {
 		var handler = {
 			resetDataEvent: () => {
 				model.resetData();
-				view.updateProvinceSelection(model.getDistinctValues('province'));
+				// view.updateProvinceSelection(model.getDistinctValues('province'));
 				d3.select('#pieGraph').html('');
 				d3.select('#barGraph').html('');
 				d3.select('#lineGraph').html('');
 			},
 
-			filterByProvinceMap: (province) => {
-				var index = domElements.provSelection.selectedIndex;
+			filterByProvinceMap: () => {
 				handler.resetDataEvent();
-				model.filterData('province', province);
-				model.filterData('units', 'Millions'); // Needs an option for caseloads
+				model.filterData('province', mapSelection);
+				model.filterData('units', handler.getSelectedFilterType());
+				model.setLineGraphData(handler.getSelected());
 				model.groupBySum(handler.getSelected(), 'value');
-				domElements.provSelection.selectedIndex = index;
+				console.log(model.lineData);
+				//domElements.provSelection.selectedIndex = index;
 				view.generatePieChart(model.pieData);
 				view.generateBarChart(model.pieData);
+				view.generateLineChart(model.lineData);
 			},
 
 			filterByProvince: () => {
@@ -232,8 +279,8 @@ d3.csv(DATAURL, d => {
 			initializeEventListeners: () => {
 				domElements.resetButton.addEventListener('click', 
 					handler.resetDataEvent);
-				domElements.provSelection.addEventListener('change',
-					handler.filterByProvince);
+				// domElements.provSelection.addEventListener('change',
+				// 	handler.filterByProvince);
 				domElements.radioButton.addEventListener('change', 
 					handler.filterByProvince);
 				domElements.expendCaseloadsRadioButton.addEventListener('change',
@@ -267,6 +314,20 @@ d3.csv(DATAURL, d => {
 					prov.text = province;
 					domElements.provSelection.add(prov);
 				})
+			},
+
+			generateMap: () => {
+				//load map data
+				d3.json("https://gist.githubusercontent.com/TeoU2015/24b4cde7c29d527311f051f549ca987e/raw/80bc06c0e6407cd650d648ad9f661318c90f3075/canadaprovtopo.json")
+				.then(function(canada){
+				//draw the provinces
+				canadaMap.selectAll("path")
+						.data(topojson.feature(canada, canada.objects.canadaprov).features)
+						.enter().append("path")
+						.attr("d", path)
+						.attr("class", "provBorders")
+						.on("click", changeMapSelection);
+				}).catch(function(error){ console.log("Something went Horribly Wrong!");})
 			},
 
 			generatePieChart: (data) => {
@@ -631,7 +692,9 @@ d3.csv(DATAURL, d => {
 			}
 		};
 
+		view.generateMap();
 		handler.initializeEventListeners();
-		view.updateProvinceSelection(model.getDistinctValues('province'));
+		// view.updateProvinceSelection(model.getDistinctValues('province'));
 		d3.select('#consoleLogData').on('click', () => {console.log(model.data);});
+		updateAll = handler.filterByProvinceMap;
 	})

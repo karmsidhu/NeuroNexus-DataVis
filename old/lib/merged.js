@@ -305,7 +305,6 @@ d3.csv(DATAURL, d => {
 			},
 
 			generateMap: () => {
-
 				//load map data
 				d3.json("https://gist.githubusercontent.com/TeoU2015/24b4cde7c29d527311f051f549ca987e/raw/80bc06c0e6407cd650d648ad9f661318c90f3075/canadaprovtopo.json")
 				.then(function(canada){

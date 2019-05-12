@@ -5,7 +5,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://d3js.org/d3.v5.min.js"></script>
+		<script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Measure What Matters</title>
     <!--    favicon-->
@@ -72,11 +76,12 @@
 															Caseloads &ensp;
 														</form>
 														<br>
-                        <select id="provinceSelection">
+                        <!-- <select id="provinceSelection">
                             <option value="">Please select a province</option>
-                        </select>
+                        </select> -->
                         </div>
 										</div>
+										<div id="map"></div>
 										<div style="display: flex">
 												<div id="pieGraph" style="display:inline-block; vertical-align:middle"></div>
 												<div id="barGraph" style="display:inline-block; vertical-align:middle; margin:auto"></div>
