@@ -1,0 +1,49 @@
+<!doctype html>
+<meta charset="utf-8">
+
+<html>
+  <head>
+    <link rel="stylesheet" href="lib/style.css">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  </head>
+
+  <body>
+    <div class="content">
+      <div>
+          <button id="resetProvinceButton">Reset</button>
+          <button id="consoleLogData">Log Data</button>
+          <form id="dataTypeForm">
+            <p>Filter By:</p>
+            <input type="radio" name="groupBy" value="program" checked="checked">
+            Program<br>
+            <input type="radio" name="groupBy" value="gvtMinistry">
+            Government Ministry<br>
+            <input type="radio" name="groupBy" value="pType">
+            Program Type<br>  
+          </form>
+          <form id="expendVsCaseloads">
+            <p>Filter By:</p>
+            <input type="radio" name="groupBy" value="Millions" checked="checked">
+            Expenditures<br>
+            <input type="radio" name="groupBy" value="Persons">
+            Caseloads<br>
+          </form>
+          <br>
+          <select id="provinceSelection">
+              <option value="">Please select a province</option>
+          </select>
+      </div>
+      
+      <div id="map"></div>
+      <div id="lineGraph"></div>
+      <div id="pieGraph"></div>
+      <div id="barGraph"></div>
+      <script src="lib/merged.js"></script>
+      <!--<script src="lib/teo/CanadaFilter.js" type="text/javascript"></script>-->
+    </div>
+  </body>
+</html>

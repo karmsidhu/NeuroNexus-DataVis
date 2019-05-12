@@ -1,49 +1,130 @@
-<!doctype html>
-<meta charset="utf-8">
+<!DOCTYPE html>
+<html lang="en">
 
-<html>
-  <head>
-    <link rel="stylesheet" href="lib/style.css">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
-    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
-    <script src="https://unpkg.com/topojson@3"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-  </head>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Measure What Matters</title>
+    <!--    favicon-->
+    <!-- <link rel="shortcut icon" href="image/fav-icon.png" type="image/x-icon"> -->
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+    <!--css-->
+    <link rel="stylesheet" href="css/style.css">
+</head>
 
-  <body>
-    <div class="content">
-      <div>
-          <button id="resetProvinceButton">Reset</button>
-          <button id="consoleLogData">Log Data</button>
-          <form id="dataTypeForm">
-            <p>Filter By:</p>
-            <input type="radio" name="groupBy" value="program" checked="checked">
-            Program<br>
-            <input type="radio" name="groupBy" value="gvtMinistry">
-            Government Ministry<br>
-            <input type="radio" name="groupBy" value="pType">
-            Program Type<br>  
-          </form>
-          <form id="expendVsCaseloads">
-            <p>Filter By:</p>
-            <input type="radio" name="groupBy" value="Millions" checked="checked">
-            Expenditures<br>
-            <input type="radio" name="groupBy" value="Persons">
-            Caseloads<br>
-          </form>
-          <br>
-          <select id="provinceSelection">
-              <option value="">Please select a province</option>
-          </select>
-      </div>
-      
-      <div id="map"></div>
-      <div id="lineGraph"></div>
-      <div id="pieGraph"></div>
-      <div id="barGraph"></div>
-      <script src="lib/merged.js"></script>
-      <!--<script src="lib/teo/CanadaFilter.js" type="text/javascript"></script>-->
-    </div>
-  </body>
+<body>
+    <section class="hero-area-fix" data-scroll-index="0">
+        <div class="hero-area" id="water">
+            <div class="container">
+                <div class="row">
+                    <div class="hero-text">
+                        <h1 style="text-shadow:-4px 0 black, 0 4px black, 4px 0 black, 0 -4px black;">Measure What Matters</h1>
+                        <h4 style="text-shadow:-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black">Neuro-Nexus</h4>
+                        <h5 style="color: white;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;font-size: 20px">Providing disability service providers with accessible tools and visualizations so they can better perform analysis to improve programs for families and individuals dealing with adversity.</h5>
+                        <br>
+                        <a href="#" class="btn view-demo" data-scroll-nav="1">About</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="product-landing pro_d" data-scroll-index="1" style="background-color:black">
+            <div class="container">
+                <div class="row" style="text-align: justify">
+                    <h2 class="title" style="color: white">About the Project</h2>
+										<p style="color: white">
+											Families of children with mental illness and/or developmental disabilities face challenges accessing and navigating fragmented disability and mental health service delivery. Limited data on provision of these services exists in Canada, making it difficult for service providers to quantify needs. To address this gap, the University of Calgary School of Public Policy have compiled a database of expenditures on and caseloads for supports and services for persons with disabilities and mental health needs in each province from fiscal year 1999/00 to present (where available). This includes services for adults, children/families, income support and tax credits/deductions. This data can be powerful in starting a dialogue to address service provision gaps. Service providers could benefit from findings from the data but often do not have the capacity to perform analysis, therefore the data has been visualized. Innovative approaches to making this data accessible to community partners and analysis of strategies to improve data quality are needed. This makes the data accessible to community partners so they can perform an analysis of strategies to improve the data quality and the provided services.
+										</p><br>
+                    <div style="text-align:center">
+                        <a href="#" class="btn view-demo" data-scroll-nav="2">View Data</a>
+                    </div>
+                    <br><br><br><br><br>
+                </div>
+            </div>
+    </section>
+    <section class="product-landing pro_d" data-scroll-index="2">
+        <div class="container">
+            <div class="row">
+                <h2 class="title">Data Visualization</h2>
+                <div class="content">
+                    <div>
+                        <div style="text-align: center">
+                            <form id="dataTypeForm">
+															<!-- Filter By: &ensp; -->
+															<p><u>Filtering</u></p>
+															<input type="radio" name="groupBy" value="program" checked="checked">
+															Program &ensp;
+															<input type="radio" name="groupBy" value="gvtMinistry">
+															Government Ministry &ensp;
+															<input type="radio" name="groupBy" value="pType">
+															Program Type &ensp;
+                            </form>
+                            <form id="expendVsCaseloads">
+															<!-- Filter By: &ensp; -->
+															<input type="radio" name="groupBy" value="Millions" checked="checked">
+															Expenditures &ensp;
+															<input type="radio" name="groupBy" value="Persons">
+															Caseloads &ensp;
+														</form>
+														<br>
+                        <select id="provinceSelection">
+                            <option value="">Please select a province</option>
+                        </select>
+                        </div>
+										</div>
+										<div style="display: flex">
+												<div id="pieGraph" style="display:inline-block; vertical-align:middle"></div>
+												<div id="barGraph" style="display:inline-block; vertical-align:middle; margin:auto"></div>
+										</div>
+										<div id="lineGraph"></div>
+                    <div style="text-align:center">
+                        <button class="btn view-demo" id="resetProvinceButton">Reset</button>
+                        <a href="#" class="btn view-demo" data-scroll-nav="0">Back To Top</a>
+                        <!-- <button class="btn view-demo" id="consoleLogData">Log Data</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+		</section>
+		<section class="product-landing pro_d" data-scroll-index="3">
+        <div class="container">
+            <div class="row">
+								<h2 class="title">Support From</h2>
+                <div class="content">
+									<div style= "text-align: center">
+											<img class="neuro-nexus-logo" src="./image/01schulich+(1).png" width="40%" style="display: inline-block;padding: 50px">
+											<img class="schulich-logo" src="./image/neuronexus+logo_final+draft.JPG" width="40%" style="display: inline-block;padding: 50px">
+											<img class="uofc-public-policy-logo" src="./image/SchoolPublicPolicy-UC-LogoBlackFinal-web.jpg" width="50%" style="display: inline-block;padding: 50px">
+									</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer-area">
+        <div class="container">
+            <div class="row text-center">
+                <p class="copyright">
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | <a href="https://colorlib.com" target="_blank">Colorlib</a>
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        </p>
+            </div>
+        </div>
+    </footer>
+    <!--End Footer area-->
+    <script src="js/jquery-2.2.4.min.js"></script>
+    <script src="./merged.js"></script>
+    <!--counter js-->
+    <script type="text/javascript" src="js/scrollIt.min.js"></script>
+    <script>
+    $(function() {
+        $.scrollIt();
+    });
+    </script>
+</body>
+
 </html>
