@@ -1,6 +1,6 @@
 .content {
     max-width: 750px;
-    margin-left: 100px;
+    margin: 0 auto;
 }
 
 .tooltip {
