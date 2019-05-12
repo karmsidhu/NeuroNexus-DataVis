@@ -5,8 +5,8 @@ const DATAURL = 'https://gist.githubusercontent.com/TeoU2015/' +
 var transitionTime = 1000;
 
 var updateAll = null;
-var mapWidth = 900;
-var mapHeight = 250;
+var mapWidth = 1000;
+var mapHeight = 350;
 var active = d3.select(null);//keep track of active province
 
 var mapSVG = d3.select("#map")
@@ -16,8 +16,8 @@ var mapSVG = d3.select("#map")
 
 var canadaMap = mapSVG.append("g").attr("id", "mapGroup");
 var projection = d3.geoMercator()
-                    .scale(450)
-                    .translate([mapWidth*1.2, mapHeight*2.4]);
+                    .scale(700)
+                    .translate([mapWidth*1.65, mapHeight*2.7]);
 
 var path = d3.geoPath().projection(projection);
 var mapSelection = null;
