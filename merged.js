@@ -208,7 +208,7 @@ d3.csv(DATAURL, d => {
 						var Program = d3.nest().key(function(d){return d.program;});
 						//get name of program
 						var LineType = d3.nest()
-							.key(function(d){return d.program+d.pComponent;})
+							.key(function(d){return d.program + ' - ' + d.pComponent;})
 							.entries(v);
 						return {max:max, Program:Program, dateRange:dateRange, 
 							LineType:LineType};
