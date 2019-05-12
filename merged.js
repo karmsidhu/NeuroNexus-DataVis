@@ -283,9 +283,9 @@ d3.csv(DATAURL, d => {
 				// domElements.provSelection.addEventListener('change',
 				// 	handler.filterByProvince);
 				domElements.radioButton.addEventListener('change', 
-					handler.filterByProvince);
+					handler.filterByProvinceMap);
 				domElements.expendCaseloadsRadioButton.addEventListener('change',
-					handler.filterByProvince);
+					handler.filterByProvinceMap);
 			},
 
 			getSelected: () => {
