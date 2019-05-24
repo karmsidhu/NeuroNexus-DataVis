@@ -328,6 +328,27 @@ d3.csv(DATAURL, d => {
 						.attr("d", path)
 						.attr("class", "provBorders")
 						.on("click", changeMapSelection);
+
+				canadaMap.selectAll("text")
+						.data(topojson.feature(canada, canada.objects.canadaprov).features)
+						.enter().append("text")
+						.attr("class", "mapText")
+						.text(function(d){
+							return d.properties.name;
+						})
+						.attr("x", function(d){
+							if (d.properties.name == "Prince Edward Island"){
+								return (path.centroid(d)[0] + 55);
+							}
+							return path.centroid(d)[0];
+						})
+						.attr("y", function(d){
+							if (d.properties.name == "Prince Edward Island"){
+								return (path.centroid(d)[1] + 8);
+							}
+							return path.centroid(d)[1];
+						});
+
 				}).catch(function(error){ console.log("Something went Horribly Wrong!");})
 			},
 

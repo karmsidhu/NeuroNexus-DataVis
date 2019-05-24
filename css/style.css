@@ -427,7 +427,7 @@ box-shadow: 0px 0px 57px -11px rgba(0,0,0,0.3);
 
 .item-imag:after {
     content: '';
-    position:
+    position: center;
 }
 
 .saas-landing {
@@ -586,4 +586,10 @@ box-shadow: 0px 0px 57px -11px rgba(0,0,0,0.3);
 
 .provBorders:hover{
     fill: rgb(255, 220, 149);
+}
+
+.mapText {
+    font-size: 13px;
+    text-anchor: middle;
+    pointer-events: none;
 }
