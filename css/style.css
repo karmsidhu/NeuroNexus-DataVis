@@ -568,7 +568,9 @@ box-shadow: 0px 0px 57px -11px rgba(0,0,0,0.3);
     padding: 5px;
 }
 
-.provBorders {
+.provGroup {
+    z-index: auto;
+    position: absolute;
     fill: #ccc;
     cursor: pointer;
     stroke: #fff;
@@ -576,7 +578,7 @@ box-shadow: 0px 0px 57px -11px rgba(0,0,0,0.3);
     stroke-linejoin: round;
 }
 
-.provBorders.active {
+.provGroup.active {
     fill: rgb(255, 164, 27);
     cursor: pointer;
     stroke: #fff;
@@ -584,12 +586,14 @@ box-shadow: 0px 0px 57px -11px rgba(0,0,0,0.3);
     stroke-linejoin: round;
 }
 
-.provBorders:hover{
+.provGroup:hover{
     fill: rgb(255, 220, 149);
 }
 
-.mapText {
+.provGroup .mapText {
+    fill: #000;
+    stroke: none;
     font-size: 13px;
     text-anchor: middle;
-    pointer-events: none;
+    cursor: pointer;
 }

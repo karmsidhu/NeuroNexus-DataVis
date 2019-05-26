@@ -24,6 +24,7 @@ var mapSelection = null;
 
 //Changes filter and the color of active province
 function changeMapSelection(d){
+	console.log(this);
 
   //check if selected provinces is already active
   //reset if true
@@ -322,16 +323,20 @@ d3.csv(DATAURL, d => {
 				d3.json("https://gist.githubusercontent.com/TeoU2015/24b4cde7c29d527311f051f549ca987e/raw/80bc06c0e6407cd650d648ad9f661318c90f3075/canadaprovtopo.json")
 				.then(function(canada){
 				//draw the provinces
-				canadaMap.selectAll("path")
-						.data(topojson.feature(canada, canada.objects.canadaprov).features)
-						.enter().append("path")
-						.attr("d", path)
-						.attr("class", "provBorders")
-						.on("click", changeMapSelection);
+				provGroup = canadaMap.selectAll("g")
+					.data(topojson.feature(canada, canada.objects.canadaprov).features)
+					.enter()
+					.append("g")
+					.attr("class", "provGroup")
+					.on("click", changeMapSelection);
 
-				canadaMap.selectAll("text")
-						.data(topojson.feature(canada, canada.objects.canadaprov).features)
-						.enter().append("text")
+				//add paths for provinces
+				provGroup.append("path")
+						.attr("d", path)
+						.attr("class", "provBorders");
+
+				//add text for provinces, with an exception for PEI an NB, because overlap
+				provGroup.append("text")
 						.attr("class", "mapText")
 						.text(function(d){
 							return d.properties.name;
@@ -343,8 +348,8 @@ d3.csv(DATAURL, d => {
 							return path.centroid(d)[0];
 						})
 						.attr("y", function(d){
-							if (d.properties.name == "Prince Edward Island"){
-								return (path.centroid(d)[1] + 8);
+							if (d.properties.name == "New Brunswick"){
+								return (path.centroid(d)[1] -10);
 							}
 							return path.centroid(d)[1];
 						});
