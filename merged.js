@@ -198,6 +198,16 @@ d3.csv(DATAURL, d => {
 			},
 
 			setLineGraphData: (attr) => {
+				/*
+				DETAILED EXPLANATION:
+				Top layer of nest structure is grouped by province
+					and provides the range and max for the axis'.
+				Second layer is grouped by the specific filter combination
+					and returns an array of the summed values
+				Third layer is grouping and summing values by date.
+				*/
+console.log(attr);
+
 				var nestedCSV = d3.nest()
 				.key(function(d){return d.province;})
 				.rollup(function(v){
@@ -209,7 +219,7 @@ d3.csv(DATAURL, d => {
 					var Program = d3.nest().key(function(d){return d.program;});
 					//get name of program
 					var LineType = d3.nest()
-					.key(function(d){return d.program + ' - ' + d.pComponent;})
+					.key(function(d){return d[attr] + ' - ' + d.pComponent;})
 					.rollup(function(d){
 						var sumValues = d3.nest()
 						.key(function(d){return d.date})
@@ -227,8 +237,6 @@ d3.csv(DATAURL, d => {
 				})
 				.entries(model.data);
 
-
-				
 				model.lineData = nestedCSV;
 			},
 
