@@ -1,6 +1,8 @@
-const DATAURL = 'https://gist.githubusercontent.com/TeoU2015/' + 
+const BACKUPDATAURL = 'https://gist.githubusercontent.com/TeoU2015/' + 
 	'0b826ea1b067800fbe19fd2bbdc2f30d/raw/a4a51d51c550755529f12' +
 	'435f59b46472abf3ecb/AllProvinces.csv';
+
+const DATAURL = "https://gist.githubusercontent.com/TeoU2015/edf3cd2bbe402426ad5ce093c49e704c/raw/489e00c03194561454f10549929c06ce6b93ff6c/AllProvinces.csv"
 
 var transitionTime = 1000;
 
@@ -24,8 +26,6 @@ var mapSelection = null;
 
 //Changes filter and the color of active province
 function changeMapSelection(d){
-	console.log(this);
-
   //check if selected provinces is already active
   //reset if true
   //otherwise remove active from current, and make selection active
@@ -108,7 +108,7 @@ var graphs = {
 		},
 		svg: (selection) => {return d3.select(selection).append('svg');},
 		getHorizontalAxisFunction: function(data) {
-			return d3.scaleTime()
+			return d3.scaleLinear(data)
 				.range([0, this.width - (this.margin.left + this.margin.right)])
 				.domain(data.value.dateRange);
 		},
@@ -142,7 +142,7 @@ d3.csv(DATAURL, d => {
 		gvtMinistry: d['Government Ministry (At Present)'],
 		pComponent: d['Program Component'],
 		units: d.Units,
-		date: parseDate(d['Fiscal Year end date']),
+		date: +d['Fiscal Year end date'],
 		value: parseFloat(d.value)
 	};
 })
@@ -199,22 +199,35 @@ d3.csv(DATAURL, d => {
 
 			setLineGraphData: (attr) => {
 				var nestedCSV = d3.nest()
-					.key(function(d){return d.province;})
-					.rollup(function(v){
-						// get date range for x axis
-						var dateRange = d3.extent(v, function(d) {return d.date;});
-						//get max for y axis range
-						var max = d3.max(v, function(d){return d.value;});
-						//get name of program
-						var Program = d3.nest().key(function(d){return d.program;});
-						//get name of program
-						var LineType = d3.nest()
-							.key(function(d){return d.program + ' - ' + d.pComponent;})
-							.entries(v);
-						return {max:max, Program:Program, dateRange:dateRange, 
-							LineType:LineType};
+				.key(function(d){return d.province;})
+				.rollup(function(v){
+					// get date range for x axis
+					var dateRange = d3.extent(v, function(d) {return d.date;});
+					//get max for y axis range
+					var max = d3.max(v, function(d){return d.value;});
+					//get name of program
+					var Program = d3.nest().key(function(d){return d.program;});
+					//get name of program
+					var LineType = d3.nest()
+					.key(function(d){return d.program + ' - ' + d.pComponent;})
+					.rollup(function(d){
+						var sumValues = d3.nest()
+						.key(function(d){return d.date})
+						.rollup(function(v){
+							return d3.sum(v, function(d){
+								return d.value;
+							})
+						})
+						.entries(d);
+						return {sumValues:sumValues};
 					})
-					.entries(model.data);
+					.entries(v);
+					return {max:max, Program:Program, dateRange:dateRange,
+							LineType:LineType};
+				})
+				.entries(model.data);
+
+
 				
 				model.lineData = nestedCSV;
 			},
@@ -556,7 +569,7 @@ d3.csv(DATAURL, d => {
 					y = graphs.line.getVerticalAxisFunction(data[0]);
 				
 				const valueLine = d3.line()
-					.x(d => {return x(d.date);})
+					.x(d => {return x(d.key);})
 					.y(d => {return y(d.value);});
 				
 				svg
@@ -605,12 +618,12 @@ d3.csv(DATAURL, d => {
 							${margin.top+margin.bottom})`);
 
 				const path = selectProvGroup.selectAll('.line')
-					.data(d => {return d.value.LineType;})
+					.data(d => {console.log(d.value.LineType);return d.value.LineType;})
 					.enter()
 					.append('path');
 				
 				path
-					.attr('d', d => {return valueLine(d.values);})
+					.attr('d', d => {return valueLine(d.value.sumValues);})
 					.attr('class', 'line')
 					.style('stroke', (d, i) => color(i))
 					.style('fill', 'none');
