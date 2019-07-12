@@ -209,15 +209,18 @@ d3.csv(DATAURL, d => {
 				console.log(attr);
 
 				var nestedCSV = d3.nest()
-				.key(function(d){return d.province;})
+				.key(function(d){return d.province;})//key is province name
 				.rollup(function(v){
 					// get date range for x axis
 					var dateRange = d3.extent(v, function(d) {return d.date;});
-					
-					//get name of program
+
+					//get nested array of each line
 					var lineType = d3.nest()
-					.key(function(d){return d[attr] + ' - ' + d.pComponent;})
+					.key(function(d){return d[attr] + ' - ' + d.pComponent;}) //key is line name
 					.rollup(function(d){
+
+						//Sum the values for the two filters, and group by date
+						//returns a list of objects
 						var sumValues = d3.nest()
 						.key(function(d){return d.date})
 						.rollup(function(v){
@@ -232,15 +235,17 @@ d3.csv(DATAURL, d => {
 							return d3.ascending(a.key, b.key)
 						});
 
+						//Get the max of all lines, to scale the y-axis
 						var lineMax = d3.max(sumValues, d=>d.value);
+
 						return {sumValues:sumValues, lineMax:lineMax};
 					})
 					.entries(v);
-					//get max for y axis range
+
+					//get max from previous max calculations for y axis range
 					var max = d3.max(lineType, d=> d.value.lineMax);
 
-					return {max:max, dateRange:dateRange,
-							lineType:lineType};
+					return {max:max, dateRange:dateRange, lineType:lineType};
 				})
 				.entries(model.data);
 
