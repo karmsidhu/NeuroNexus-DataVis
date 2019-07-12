@@ -206,19 +206,16 @@ d3.csv(DATAURL, d => {
 					and returns an array of the summed values
 				Third layer is grouping and summing values by date.
 				*/
-console.log(attr);
+				console.log(attr);
 
 				var nestedCSV = d3.nest()
 				.key(function(d){return d.province;})
 				.rollup(function(v){
 					// get date range for x axis
 					var dateRange = d3.extent(v, function(d) {return d.date;});
-					//get max for y axis range
-					var max = d3.max(v, function(d){return d.value;});
+					
 					//get name of program
-					var Program = d3.nest().key(function(d){return d.program;});
-					//get name of program
-					var LineType = d3.nest()
+					var lineType = d3.nest()
 					.key(function(d){return d[attr] + ' - ' + d.pComponent;})
 					.rollup(function(d){
 						var sumValues = d3.nest()
@@ -229,11 +226,21 @@ console.log(attr);
 							})
 						})
 						.entries(d);
-						return {sumValues:sumValues};
+
+						//sort ascending year, because previous rollup is messy
+						sumValues.sort(function(a,b){
+							return d3.ascending(a.key, b.key)
+						});
+
+						var lineMax = d3.max(sumValues, d=>d.value);
+						return {sumValues:sumValues, lineMax:lineMax};
 					})
 					.entries(v);
-					return {max:max, Program:Program, dateRange:dateRange,
-							LineType:LineType};
+					//get max for y axis range
+					var max = d3.max(lineType, d=> d.value.lineMax);
+
+					return {max:max, dateRange:dateRange,
+							lineType:lineType};
 				})
 				.entries(model.data);
 
@@ -275,8 +282,6 @@ console.log(attr);
 				model.filterData('units', handler.getSelectedFilterType());
 				model.setLineGraphData(handler.getSelected());
 				model.groupBySum(handler.getSelected(), 'value');
-				console.log(model.lineData);
-				//domElements.provSelection.selectedIndex = index;
 				view.generatePieChart(model.pieData);
 				view.generateBarChart(model.pieData);
 				view.generateLineChart(model.lineData);
@@ -291,7 +296,6 @@ console.log(attr);
 					model.filterData('units', handler.getSelectedFilterType());
 					model.setLineGraphData(handler.getSelected());
 					model.groupBySum(handler.getSelected(), 'value');
-					console.log(model.lineData);
 					domElements.provSelection.selectedIndex = index;
 					view.generatePieChart(model.pieData);
 					view.generateBarChart(model.pieData);
@@ -626,7 +630,7 @@ console.log(attr);
 							${margin.top+margin.bottom})`);
 
 				const path = selectProvGroup.selectAll('.line')
-					.data(d => {console.log(d.value.LineType);return d.value.LineType;})
+					.data(d => {console.log(d.value.lineType);return d.value.lineType;})
 					.enter()
 					.append('path');
 				
@@ -646,7 +650,7 @@ console.log(attr);
 				legendContents = legendBox.select(".lineName");
 		
 				legendContents.selectAll("text")
-					.data(function(d){return d.value.LineType;})
+					.data(function(d){return d.value.lineType;})
 					.enter()
 					.append("text")
 					.text(function(d){ return d.key;})
@@ -658,7 +662,7 @@ console.log(attr);
 		
 		
 				legendContents.selectAll("rect")
-					.data(function(d){return d.value.LineType;})
+					.data(function(d){return d.value.lineType;})
 					.enter()
 					.append("rect")
 					.attr("x", 0)
@@ -689,7 +693,7 @@ console.log(attr);
 				var lines = document.getElementsByClassName('line');
 		
 				var mousePerLine = mouseG.selectAll('.mouse-per-line')
-					.data(function(d){return d.value.LineType;})
+					.data(function(d){return d.value.lineType;})
 					.enter()
 					.append("g")
 						.attr("class", "mouse-per-line");
