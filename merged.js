@@ -736,47 +736,26 @@ d3.csv(DATAURL, d => {
 
 				var mousemove = function() {
 					var mouse = d3.mouse(this);
-					d3.select(".mouse-line")
-						.attr("d", function() {
-							var d = "M" + mouse[0] + "," + height;
-							d += " " + mouse[0] + "," + 0;
-							return d;
+					d3.select(".mouse-line") //just draws a vertical line at mouse point
+						.attr("d", function(d) {
+							var pos = "M" + mouse[0] + "," + height;
+							pos += " " + mouse[0] + "," + 0;
+							return pos;
 						});
 		
-					d3.selectAll(".mouse-per-line")
-						.attr("transform", function(d, i) {
-							// console.log(width/mouse[0])
-							var xDate = x.invert(mouse[0]),
-									bisect = d3.bisector(function(d) {return d.date;}).left;
-									idx = bisect(xDate);
-							// console.log(idx);
-						
-							var beginning = 0,
-									end = lines[i].getTotalLength(),
-									target = null;
-		
-							while(true) {
-								target = Math.floor((beginning + end) / 2);
-								pos = lines[i].getPointAtLength(target);
-								if ((target === end || target === beginning) 
-									&& pos.x !== mouse[0]) {
-									break;
-								}
-								if (pos.x > mouse[0]) {
-									end = target;
-								}
-								else if (pos.x < mouse[0]) {
-									beginning = target;
-								}
-								else {
-									break;
-								} //position found
-							}
-								
+					d3.selectAll(".mouse-per-line")// figures out where to put the tracking circles
+						.attr("transform", function(d) {
+							var xPos = x.invert(mouse[0]),
+									bisect = d3.bisector(function(d) {return d.key;}).left;
+									targetIndex = bisect(d.value.sumValues, xPos);
+
+							var circleY = y(d.value.sumValues[targetIndex].value);
+							var circleX = x(d.value.sumValues[targetIndex].key);
+
 							d3.select(this).select('text')
-								.text(y.invert(pos.y).toFixed(2));
+								.text(y.invert(circleY).toFixed(2));
 								
-							return "translate(" + mouse[0] + "," + pos.y +")";
+							return "translate(" + circleX + "," + circleY +")";
 						});
 				}
 
@@ -786,7 +765,7 @@ d3.csv(DATAURL, d => {
 					.attr('fill', 'none')
 					.attr('pointer-events', 'all')
 					.on('mouseout', mouseout)
-					.on('mouseover', mouseover)//I HAVE NO IDEA WHAT'S HAPPENING BELOW
+					.on('mouseover', mouseover)
 					.on('mousemove', mousemove);
 			}
 		};
