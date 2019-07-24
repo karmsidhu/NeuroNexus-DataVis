@@ -583,7 +583,9 @@ d3.csv(DATAURL, d => {
 					svg = graphs.line.svg('#lineGraph'),
 					color = d3.scaleOrdinal(d3.schemeDark2),
 					x = graphs.line.getHorizontalAxisFunction(data[0]),
-					y = graphs.line.getVerticalAxisFunction(data[0]);
+					y = graphs.line.getVerticalAxisFunction(data[0]),
+					xAxis = d3.axisBottom(x);
+
 				
 				const valueLine = d3.line()
 					.x(d => {return x(d.key);})
@@ -602,8 +604,8 @@ d3.csv(DATAURL, d => {
 						.attr('transform', `translate(${margin.left+margin.right},
 							${margin.top+margin.bottom})`)
 						.call(d3.axisLeft(y))
-					.selectAll('text')
-						.data(data[0].value);
+					//.selectAll('text')
+						//.data(data[0].value);
 				
 				svg
 					.append('text')
@@ -619,12 +621,9 @@ d3.csv(DATAURL, d => {
 						.attr('class', 'xaxis')
 						.attr('transform', `translate(${margin.left+margin.right}, 
 							${height})`)
-						.call(d3.axisBottom(x));
+						.call(xAxis);
 
-				var legendBox = svg.append("g")
-					.attr("class","legend")
-					.attr("transform","translate(550,30)")
-					.style("font-size","12px");
+				
 
 				const selectProvGroup = svg.selectAll('.provinceGroups')
 					.data(data, d => {return d;})
@@ -635,7 +634,7 @@ d3.csv(DATAURL, d => {
 							${margin.top+margin.bottom})`);
 
 				const path = selectProvGroup.selectAll('.line')
-					.data(d => {console.log(d.value.lineType);return d.value.lineType;})
+					.data(d => {return d.value.lineType;})
 					.enter()
 					.append('path');
 				
@@ -644,6 +643,12 @@ d3.csv(DATAURL, d => {
 					.attr('class', 'line')
 					.style('stroke', (d, i) => color(i))
 					.style('fill', 'none');
+
+				//Create Legends
+				var legendBox = svg.append("g")
+					.attr("class","legend")
+					.attr("transform","translate(550,30)")
+					.style("font-size","12px");
 
 				legendBox.selectAll(".lineName")
 					.data(data, function(d){return d;})
@@ -738,8 +743,18 @@ d3.csv(DATAURL, d => {
 					var mouse = d3.mouse(this);
 					d3.select(".mouse-line") //just draws a vertical line at mouse point
 						.attr("d", function(d) {
-							var pos = "M" + mouse[0] + "," + height;
-							pos += " " + mouse[0] + "," + 0;
+							//extract an array of all years within the current axis
+							//unsure if there is a better way of getting this currently
+							var yearList=[];
+							for (i = d.value.dateRange[0]; i <= d.value.dateRange[1]; i++){yearList.push(i);};
+
+							var xPos = x.invert(mouse[0]),
+									targetIndex = d3.bisectLeft(yearList, xPos)-1; //subtract 1 to get index 0 values
+									//targetIndex = ((targetIndex < 0) ? 0: targetIndex);// prevent index[-1] errors
+							var linePos = x(yearList[targetIndex]);
+
+							var pos = "M" + linePos + "," + height;
+							pos += " " + linePos + "," + 0;
 							return pos;
 						});
 		
@@ -747,7 +762,8 @@ d3.csv(DATAURL, d => {
 						.attr("transform", function(d) {
 							var xPos = x.invert(mouse[0]),
 									bisect = d3.bisector(function(d) {return d.key;}).left;
-									targetIndex = bisect(d.value.sumValues, xPos);
+									targetIndex = bisect(d.value.sumValues, xPos)-1; //subtract 1 to get index 0 values
+									targetIndex = ((targetIndex < 0) ? 0: targetIndex);// prevent index[-1] errors
 
 							var circleY = y(d.value.sumValues[targetIndex].value);
 							var circleX = x(d.value.sumValues[targetIndex].key);
@@ -757,6 +773,23 @@ d3.csv(DATAURL, d => {
 								
 							return "translate(" + circleX + "," + circleY +")";
 						});
+
+					legendContents.selectAll("text")
+						.text(function(d){
+							var xPos = x.invert(mouse[0]),
+									bisect = d3.bisector(function(d) {return d.key;}).left;
+									targetIndex = bisect(d.value.sumValues, xPos)-1; //subtract 1 to get index 0 values
+									targetIndex = ((targetIndex < 0) ? 0: targetIndex);// prevent index[-1] errors
+
+							var YValue = (d.value.sumValues[targetIndex].value).toFixed(2)
+							var unit = ((handler.getSelectedFilterType() === 'Millions') 
+							? 'Millions' : 'Caseloads');
+							
+							return String(YValue)+" "+unit+": "+d.key;
+						})
+					.attr("transform", function(d,i){
+							return `translate( ${5} , ${i*15})`;//shuffle new text downwards by iterator
+						})
 				}
 
 				mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
