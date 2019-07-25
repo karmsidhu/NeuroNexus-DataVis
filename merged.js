@@ -353,6 +353,8 @@ d3.csv(DATAURL, d => {
 				d3.json("https://gist.githubusercontent.com/TeoU2015/24b4cde7c29d527311f051f549ca987e/raw/80bc06c0e6407cd650d648ad9f661318c90f3075/canadaprovtopo.json")
 				.then(function(canada){
 				//draw the provinces
+				provincesOnly = canada.objects.canadaprov.geometries.filter(function(d){if (d.id != "CA-YT" && d.id != "CA-NU" && d.id != "CA-NT"){return d.id}})
+				canada.objects.canadaprov.geometries = provincesOnly;
 				provGroup = canadaMap.selectAll("g")
 					.data(topojson.feature(canada, canada.objects.canadaprov).features)
 					.enter()
