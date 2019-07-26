@@ -1,5 +1,5 @@
 class Line extends Chart {
-  constructor(svg, height, width, margin, trnsTime = 1000) {
+  constructor(svg, height, width, margin, trnsTime) {
     super(svg, height, width, margin, trnsTime);
 
     this._initializeHelperFunctions();
@@ -63,6 +63,7 @@ class Line extends Chart {
         .attr('pointer-events', 'all')
         .attr('fill', 'none');
 
+    // Default Mouse Events Below
     this.handleMouseOver = () => {
       this.plotEvents
         .select('path')
@@ -84,11 +85,11 @@ class Line extends Chart {
 
       this.plotEvents
         .selectAll('circle')
-        .style("opacity", 0);
+          .style("opacity", 0);
 
       this.plotEvents
         .selectAll('text')
-        .style('opacity', 0);
+          .style('opacity', 0);
     };
 
     this.handleMouseMove = () => {
@@ -98,14 +99,17 @@ class Line extends Chart {
               .map(d => this.dateParse(d)),
             mouseX = this.xPosition.invert(d3.mouse(d3.event.target)[0]),
             index = d3.bisectLeft(yearList, mouseX) - 1,
-            xPos = this.xPosition(yearList[index]) + 0.5, // 0.5 to match xAxis tick translation done by d3
+            xPos = this.xPosition(yearList[index]) + 0.5, 
+              // 0.5 to match xAxis tick translation done by d3
             bisect = d3.bisector(d => this.dateParse(d.year)).left; 
 
+      // Vertical Line Position
       this.plotEvents
         .select('path')
-        .attr('d', `M${xPos} ${this.height - 
-          this.margin.bottom - this.margin.bottom} ${xPos} ${0}`);
+          .attr('d', `M${xPos} ${this.height - 
+            this.margin.bottom - this.margin.bottom} ${xPos} ${0}`);
       
+      // Circle Indicator and Annotation Position
       this.plotEvents
         .selectAll('g')
           .attr('transform', (d, nodeIndex, nodes) => {
@@ -116,20 +120,20 @@ class Line extends Chart {
 
             d3.select(nodes[nodeIndex])
               .select('text')
-              .text(d.value[i].value.toFixed(2));
+                .text(d.value[i].value.toFixed(2));
 
             return `translate(${x},${y})`;
           });
       
+      // Legend Value Update
       this.legend
         .selectAll('text')
-        .text((d) => {
-          const targetIndex = bisect(d.value, mouseX) - 1, 
-                i = targetIndex < 0 ? 0: targetIndex;
+          .text((d) => {
+            const targetIndex = bisect(d.value, mouseX) - 1, 
+                  i = targetIndex < 0 ? 0: targetIndex;
 
-          return `${d.value[i].value.toFixed(2)} Units: ${d.key}`;
-        })
-        
+            return `${d.value[i].value.toFixed(2)} Units: ${d.key}`;
+          });
     }
   }
 
@@ -141,16 +145,15 @@ class Line extends Chart {
   }
 
   drawChart() {
-    const baseOpacity = 0.6;
-    // Update Axis's
+    // Update X and Y Axis
     this.yPosition
-      .domain([d3.max(this.data, d => d3.max(d.value, d => d.value)), 0]) // Change d.key to d.name
+      .domain([d3.max(this.data, d => d3.max(d.value, d => d.value)), 0])
       .nice();
     this.yAxis
       .call(d3.axisLeft(this.yPosition));
 
     this.xPosition
-      .domain([d3.min(this.data, d=>d.minYear), 
+      .domain([d3.min(this.data, d => d.minYear), 
         d3.max(this.data, d => d.maxYear)])
       .nice();
     this.xAxis
@@ -178,13 +181,14 @@ class Line extends Chart {
         .attr('fill', 'none')
         .attr('stroke', (d, i) => this.color(i))
         .attr('stroke-width', 4)
-        .style('opacity', baseOpacity)
+        .style('opacity', 0.6)
         .attr('stroke-dasharray', function() {return this.getTotalLength()})
         .attr('stroke-dashoffset', function() {return this.getTotalLength()})
-        .transition()
-        .duration(this.transitionTime)
+      .transition()
+      .duration(this.transitionTime)
         .attr('stroke-dashoffset', 1);
 
+    // Legend Positioning and Text
     this.legend
       .selectAll('text')
       .data(this.data)
@@ -193,6 +197,7 @@ class Line extends Chart {
         .text(d => d.key)
         .attr('transform', (d, i) => `translate(${0},${i*20})`)
 
+    // Legend Color References
     this.legend
       .selectAll('rect')
       .data(this.data)
@@ -204,8 +209,9 @@ class Line extends Chart {
         .attr('height', 10)
         .attr('transform', (d, i) => `translate(${-5},${i*20})`)
         .attr('fill', (d, i) => this.color(i))
-        .style('opacity', baseOpacity);
+        .style('opacity', 0.6);
 
+    // Circle and Text Elements for Plot Events
     const plotMarkers = this.plotEvents.selectAll('g')
       .data(this.data)
       .enter()
@@ -225,6 +231,7 @@ class Line extends Chart {
         .style('font', '14px sans-serif')
         .attr("transform", "translate(10,3)");
 
+    // Set Event Listeners on Transparent SVG Rectangle over the Plot
     this.plotEvents
       .select('rect')
         .on('mouseover', this.handleMouseOver)
